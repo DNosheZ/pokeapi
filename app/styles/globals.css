@@ -4,6 +4,40 @@
 @tailwind utilities;
 
 
+:root {
+  /* Purples */
+  --purple-1: #6F377A;
+  --purple-2: #63316d;
+  --purple-3: #582c61;
+  --purple-4: #4d2655;
+  --purple-1v: #7D4b87;
+  --purple-2v: #8b5e94;
+  --purple-3v: #9a73a1;
+  --purple-4v: #A887af;
+
+  /* Greys */
+  --grey-1: #4F4F4E;
+  --grey-2: #BdBdBd;
+  --grey-3: #a8a8a8;
+  --grey-4: #939393;
+  
+
+  /* Greens */
+  --green-1: #2DBE6E;
+  --green-2: #28AB63;
+  --green-3: #249858;
+  --green-4: #1F854D;
+  --green-1v: #47DF94;
+  --green-2v: #62EDAB;
+  --green-3v: #3BC079;
+  --green-4v: #84DEAC;
+
+  /* Base colors */
+  --white: #FFFFFF;
+  --bg-light: #E6F7E9;
+}
+
+
 body{
-  @apply bg-neutral-950;
+    background-color: var(--purple-2);
 }
