@@ -34,12 +34,10 @@ const handler = NextAuth({
           if (!user || !user.password) return null;
           const valid = await bcrypt.compare(credentials.password, user.password);
           if (!valid) return null;
-          // Puedes retornar más campos si los necesitas en la sesión
           return {
             id: String(user.id),
             email: user.email,
             firstname: user.firstname,
-            lastname: user.lastname,
           };
         } catch (error) {
           console.error("Authorize error:", error);
@@ -57,7 +55,6 @@ const handler = NextAuth({
         session.user = session.user || {};
         session.user.id = token.id;
         session.user.firstname = token.firstname;
-        session.user.lastname = token.lastname;
         session.user.email = token.email;
       }
       return session;
@@ -66,7 +63,6 @@ const handler = NextAuth({
       if (user) {
         token.id = user.id;
         token.firstname = user.firstname;
-        token.lastname = user.lastname;
         token.email = user.email;
       }
       return token;
