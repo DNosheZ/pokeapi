@@ -39,7 +39,8 @@ export default function Catalog() {
 
   useEffect(() => {
     async function load() {
-      // 1) lista
+      setLoading(true);
+      const offset = (page - 1) * PAGE_SIZE;
       const listRes = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${PAGE_SIZE}&offset=${offset}`);
       const listJson: PokeListResponse = await listRes.json();
       setCount(listJson.count ?? 0);
