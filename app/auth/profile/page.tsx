@@ -8,7 +8,7 @@ export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/auth/login");
 
-  const { username, firstname, email, createdAt } = session.user as any;
+  const { username, firstname, email, createdAt } = session.user;
 
   return (
     <>

@@ -3,6 +3,7 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import db from "@/libs/db";
+import { type JWT } from "next-auth/jwt";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
@@ -34,8 +35,8 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.userId = user.id;
-        token.username = user.name;
+        token.userId = (user as any).id;
+        token.username = user.name ?? token.username;
       }
       if (token.email) {
         const dbUser = await db.user.findUnique({
@@ -49,11 +50,11 @@ export const authOptions: NextAuthOptions = {
           token.createdAt = dbUser.createdAt.toISOString();
         }
       }
-      return token;
+      return token as JWT;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).id = token.userId;
+        (session.user as any).id = token.userId as string | number | undefined;
         (session.user as any).username = token.username;
         (session.user as any).firstname = token.firstname;
         (session.user as any).createdAt = token.createdAt;

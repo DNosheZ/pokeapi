@@ -10,13 +10,25 @@ import Modal from "@/components/Modal";
 
 const PAGE_SIZE = 10;
 
+type PokemonCardData = {
+  name: string;
+  weight: number;
+  moves: string[];
+  imageUrl: string;
+};
+
+type PokeListResponse = {
+  count: number;
+  results: { name: string; url: string }[];
+};
+
 export default function Catalog() {
   const router = useRouter();
   const [page, setPage] = useState(1);
-  const [count, setCount] = useState<number>(0);
-  const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState<any | null>(null);
+  const [items, setItems] = useState<PokemonCardData[]>([]);
+  const [selected, setSelected] = useState<PokemonCardData | null>(null);
+  const [count, setCount] = useState<number>(0);
 
   // Guard
   useEffect(() => {
@@ -26,44 +38,32 @@ export default function Catalog() {
   const totalPages = useMemo(() => Math.ceil(count / PAGE_SIZE), [count]);
 
   useEffect(() => {
-    let cancelled = false;
     async function load() {
-      try {
-        setLoading(true);
-        const offset = (page - 1) * PAGE_SIZE;
+      // 1) lista
+      const listRes = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${PAGE_SIZE}&offset=${offset}`);
+      const listJson: PokeListResponse = await listRes.json();
+      setCount(listJson.count ?? 0);
 
-        // 1) Listado base para paginar
-        const listRes = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${PAGE_SIZE}&offset=${offset}`);
-        const listJson = await listRes.json(); // { count, results: [{name, url}] }
-        if (cancelled) return;
-        setCount(listJson.count ?? 0);
-
-        // 2) Traer detalles de cada Pokémon para name, weight, moves, image
-        const detailPromises = listJson.results.map(async (p) => {
-          const res = await fetch(p.url);
-          const j = await res.json();
-          const name = j.name;
-          const weight = j.weight;
-          const moves = (j.moves || []).map((m) => m.move?.name).slice(0, 2);
-          const imageUrl =
+      // 2) detalles
+      const detailPromises = listJson.results.map(async (p) => {
+        const res = await fetch(p.url);
+        const j = await res.json();
+        const data: PokemonCardData = {
+          name: j.name,
+          weight: j.weight,
+          moves: (j.moves || []).map((m: any) => m.move?.name).slice(0, 2),
+          imageUrl:
             j.sprites?.other?.["official-artwork"]?.front_default ||
             j.sprites?.front_default ||
-            "";
-          return { name, weight, moves, imageUrl, raw: j };
-        });
+            "",
+        };
+        return data;
+      });
 
-        const details = await Promise.all(detailPromises);
-        if (cancelled) return;
-        setItems(details);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+      const details = await Promise.all(detailPromises);
+      setItems(details);
     }
-
     load();
-    return () => { cancelled = true; };
   }, [page]);
 
   return (
