@@ -13,7 +13,6 @@ function SignUpPage() {
         formState: { errors },
     } = useForm();
     const router = useRouter();
-    const [error, setError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
 
