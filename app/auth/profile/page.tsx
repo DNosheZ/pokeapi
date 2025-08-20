@@ -29,6 +29,9 @@ export default async function ProfilePage() {
                   src="/images/dragonite.png"
                   alt="Avatar tipo dragón del usuario"
                   className="w-24 h-24 object-contain"
+                  priority={false}
+                  width={96}
+                  height={96}
                 />
               </div>
             </div>

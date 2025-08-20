@@ -7,7 +7,12 @@ export default function Footer() {
             <div className="md:flex md:justify-between">
               <div className="mb-6 md:mb-0">
                   <a href="https://dnoshez.github.io" className="flex items-center">
-                      <Image src="/images/01 Adz con fondo.png" className="h-8 me-3" alt="ProjectZ Logo" />
+                      <Image src="/images/01 Adz con fondo.png" 
+                      className="me-3" alt="ProjectZ Logo"
+                    width={32}
+                    height={32}
+                    
+                    priority={false} />
                       <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">ProjectZ S.A.S</span>
                   </a>
               </div>

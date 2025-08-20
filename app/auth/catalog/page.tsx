@@ -82,7 +82,6 @@ export default function Catalog() {
             </div>
           </div>
 
-          {loading && <div className="mb-4">Cargando...</div>}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {items.map((p) => (
