@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Image from "next/image";
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
@@ -24,7 +25,7 @@ export default async function ProfilePage() {
                           flex items-center justify-center overflow-hidden"
                 aria-hidden="true"
               >
-                <img
+                <Image
                   src="/images/dragonite.png"
                   alt="Avatar tipo dragón del usuario"
                   className="w-24 h-24 object-contain"

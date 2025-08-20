@@ -23,6 +23,7 @@ type PokeListResponse = {
   count: number;
   results: { name: string; url: string }[];
 };
+type MoveItem = { move: { name: string } };
 
 export default function Catalog() {
   const router = useRouter();
@@ -54,7 +55,7 @@ export default function Catalog() {
         const data: PokemonCardData = {
           name: j.name,
           weight: j.weight,
-          moves: (j.moves || []).map((m: any) => m.move?.name).slice(0, 2),
+          moves: (j.moves as MoveItem[]).map((m) => m.move.name).slice(0, 2),
           imageUrl:
             j.sprites?.other?.["official-artwork"]?.front_default ||
             j.sprites?.front_default ||

@@ -1,9 +1,11 @@
+// lib/auth.ts
 import "server-only";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import db from "@/libs/db";
-import { type JWT } from "next-auth/jwt";
+
+type CredUser = { id?: string | number; name?: string | null; email?: string | null };
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
@@ -11,11 +13,12 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username:    { label: "Username", type: "text" },
+        username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
         if (!credentials?.username || !credentials.password) return null;
+
         const userFound = await db.user.findUnique({
           where: { username: credentials.username },
         });
@@ -26,7 +29,7 @@ export const authOptions: NextAuthOptions = {
 
         return {
           id: String(userFound.id),
-          name: userFound.username,      
+          name: userFound.username,
           email: userFound.email,
         };
       },
@@ -35,9 +38,12 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.userId = (user as any).id;
-        token.username = user.name ?? token.username;
+        const u = user as CredUser;
+        token.userId = u.id;
+        token.username = u.name ?? token.username;
+        token.email = u.email ?? token.email;
       }
+
       if (token.email) {
         const dbUser = await db.user.findUnique({
           where: { email: token.email },
@@ -50,14 +56,14 @@ export const authOptions: NextAuthOptions = {
           token.createdAt = dbUser.createdAt.toISOString();
         }
       }
-      return token as JWT;
+      return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).id = token.userId as string | number | undefined;
-        (session.user as any).username = token.username;
-        (session.user as any).firstname = token.firstname;
-        (session.user as any).createdAt = token.createdAt;
+        session.user.id = token.userId as string | number | undefined;
+        session.user.username = token.username as string | undefined;
+        session.user.firstname = token.firstname as string | undefined;
+        session.user.createdAt = token.createdAt as string | undefined;
       }
       return session;
     },

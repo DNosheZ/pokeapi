@@ -4,16 +4,12 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
-// Prisma singleton pattern to avoid connection issues in dev
-let prisma: PrismaClient;
-if (process.env.NODE_ENV === "production") {
-  prisma = new PrismaClient();
-} else {
-  if (!(global as any).prisma) {
-    (global as any).prisma = new PrismaClient();
-  }
-  prisma = (global as any).prisma;
+declare global {
+  var prisma: PrismaClient | undefined;
 }
+
+const prisma = global.prisma ?? new PrismaClient();
+if (process.env.NODE_ENV !== "production") global.prisma = prisma;
 
 const handler = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -22,52 +18,49 @@ const handler = NextAuth({
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        email:    { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-        try {
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
-          });
-          if (!user || !user.password) return null;
-          const valid = await bcrypt.compare(credentials.password, user.password);
-          if (!valid) return null;
-          return {
-            id: String(user.id),
-            email: user.email,
-            firstname: user.firstname,
-          };
-        } catch (error) {
-          console.error("Authorize error:", error);
-          return null;
-        }
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+        if (!user || !user.password) return null;
+
+        const valid = await bcrypt.compare(credentials.password, user.password);
+        if (!valid) return null;
+
+        return {
+          id: String(user.id),
+          email: user.email,
+          firstname: user.firstname,
+        };
       },
     }),
   ],
-  pages: {
-    signIn: "/login",
-  },
+  pages: { signIn: "/login" },
   callbacks: {
     async session({ session, token }) {
-      if (token) {
-        session.user = session.user || {};
-        session.user.id = token.id;
-        session.user.firstname = token.firstname;
-        session.user.email = token.email;
+      if (session.user) {
+        // gracias a la augmentación, estos campos existen
+        session.user.id = token.id as string | number | undefined;
+        session.user.firstname = token.firstname as string | undefined;
+        session.user.email = token.email as string | undefined;
       }
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.firstname = user.firstname;
+        token.id = (user as { id?: string | number }).id;
+        token.firstname = (user as { firstname?: string }).firstname;
         token.email = user.email;
       }
       return token;
     },
   },
 });
+
 export const runtime = "nodejs";
 export { handler as GET, handler as POST };
