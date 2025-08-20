@@ -2,10 +2,10 @@
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { setToken, fakeJwt, getToken } from "@/utils/authClient";
+import { setToken, fakeJwt } from "@/utils/authClient";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"; 
 
 

@@ -7,6 +7,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PokemonCard from "@/components/PokemonCard";
 import Modal from "@/components/Modal";
+import Image from "next/image";
+
 
 const PAGE_SIZE = 10;
 
@@ -122,7 +124,7 @@ export default function Catalog() {
           {selected && (
             <div>
               <div className="flex items-center gap-4 mb-4">
-                <img src={selected.imageUrl} alt={selected.name} className="w-20 h-20 object-contain" />
+                <Image src={selected.imageUrl} alt={selected.name} className="w-20 h-20 object-contain" />
                 <div>
                   <h2 className="text-xl font-bold text-[var(--purple-1)] capitalize">{selected.name}</h2>
                   <p className="text-[var(--grey-1)]">Weight: {selected.weight} kg</p>
